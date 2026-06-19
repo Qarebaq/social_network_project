@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "id": "A",
+      "name": "Ali"
+    },
+    {
+      "id": "B",
+      "name": "Bahar"
+    },
+    {
+      "id": "C",
+      "name": "Cyrus"
+    },
+    {
+      "id": "D",
+      "name": "Dina"
+    }
+  ],
+  "friendships": [
+    {
+      "user1_id": "A",
+      "user2_id": "B",
+      "weight": 1
+    },
+    {
+      "user1_id": "B",
+      "user2_id": "C",
+      "weight": 1
+    }
+  ]
+}

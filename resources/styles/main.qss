@@ -1,0 +1,19 @@
+QMainWindow {
+    /* TODO: define main window style */
+}
+
+QPushButton {
+    /* TODO: define button style */
+}
+
+QLabel {
+    /* TODO: define label style */
+}
+
+QListWidget {
+    /* TODO: define user list style */
+}
+
+QTextEdit {
+    /* TODO: define result panel style */
+}
