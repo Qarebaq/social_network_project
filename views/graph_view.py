@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget
 
 
 class GraphView(QWidget):
-
+    """ Graph visualization view. This module defines the Qt widget responsible for displaying the social network graph visually, including users as nodes, friendships as edges, and optional highlighting for paths or components. """
 
     def __init__(self):
         super().__init__()

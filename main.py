@@ -11,6 +11,9 @@ from views.main_window import MainWindow
 
 
 def main():
+
+    """ Application entry point for the Social Network Analysis project. This module initializes the Qt application, creates the main project objects such as the graph, facade, repository, controller, and main window, then starts the application event loop. """
+
     # TODO: create QApplication
     app = QApplication(sys.argv)
 

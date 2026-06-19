@@ -1,5 +1,5 @@
 class Friendship:
-
+    """ Friendship domain model. This module defines the Friendship entity, which represents an undirected edge between two users in the social network graph. Each friendship may optionally store a weight, although the main project treats friendships as unweighted. """
     def __init__(self, user1_id, user2_id, weight=1):
         self.user1_id = user1_id
         self.user2_id = user2_id

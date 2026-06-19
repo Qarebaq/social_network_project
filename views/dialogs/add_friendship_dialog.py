@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import QDialog
 
+""" Add friendship dialog. This module defines a Qt dialog for selecting two users and requesting the creation of a friendship between them. """
 
 class AddFriendshipDialog(QDialog):
-
 
     def __init__(self, users=None, parent=None):
         super().__init__(parent)

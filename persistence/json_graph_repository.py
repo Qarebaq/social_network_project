@@ -1,7 +1,5 @@
 class GraphRepository:
-    """
-    Interface for graph storage
-    """
+    """ JSON graph repository. This module implements graph persistence using JSON files. It is responsible for saving graph data to disk and loading graph data back into application objects. """
 
     def save(self, graph, file_path):
         # TODO: save graph to storage

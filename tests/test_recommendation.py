@@ -1,5 +1,5 @@
 from graph.services.recommendation_service import RecommendationService
-
+""" Tests for friend recommendation operations. This module contains tests for friend suggestions, mutual-friend scoring, excluding current friends, excluding the selected user, and cases with no valid recommendations. """
 
 def test_suggest_friends():
     # TODO: test basic friend suggestion

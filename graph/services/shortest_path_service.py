@@ -1,5 +1,6 @@
 from graph.results.shortest_path_result import ShortestPathResult
 class ShortestPathService:
+    """ Shortest path service. This module provides operations for finding the shortest path between two users in an unweighted social network graph. The expected algorithm for this service is Breadth-First Search. """
     def find_shortest_path(self, graph, source_user_id, target_user_id):
         # TODO: find shortest path using BFS
         pass

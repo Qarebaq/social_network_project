@@ -1,5 +1,5 @@
 class NetworkStatistics:
-
+    """ Network statistics result model. This module defines the result object returned by network statistics operations. It stores summary information such as total users, total friendships, average degree, largest components, and most connected users. """
     def __init__(
         self,
         total_users,

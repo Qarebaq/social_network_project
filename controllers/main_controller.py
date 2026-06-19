@@ -1,4 +1,5 @@
 class MainController:
+    """ Main controller for the Social Network Analysis application. This module connects the graphical user interface to the graph logic. It handles user actions from the UI, calls the appropriate facade or repository methods, updates views, and manages application-level errors. """
     def __init__(self, graph, facade, repository, main_window):
         self.graph = graph
         self.facade = facade

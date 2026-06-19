@@ -2,6 +2,7 @@ from graph.results.distance_report import DistanceReport
 
 
 class DistanceService:
+    """ Distance analysis service. This module provides operations for calculating the distance from one user to all other users in the network. For the unweighted graph used in this project, distances are calculated with Breadth-First Search. """
 
     def get_distances_from_user(self, graph, source_user_id):
         # TODO: calculate distance from source user to all users

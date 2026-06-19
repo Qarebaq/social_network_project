@@ -6,7 +6,7 @@ from views.result_panel import ResultPanel
 
 
 class MainWindow(QMainWindow):
-
+    """ Main application window. This module defines the main Qt window of the application. It organizes the main UI panels, connects view-level signals, and provides methods for refreshing and displaying application data. """
     def __init__(self):
         super().__init__()
 

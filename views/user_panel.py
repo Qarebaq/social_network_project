@@ -3,7 +3,7 @@ from PySide6.QtCore import Signal
 
 
 class UserPanel(QWidget):
-
+    """ User management panel. This module defines the Qt widget used for displaying users and requesting user or friendship operations such as adding, removing, editing, selecting users, and creating friendships. """
 
     add_user_requested = Signal()
     remove_user_requested = Signal(str)

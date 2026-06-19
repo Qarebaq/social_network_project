@@ -1,6 +1,6 @@
 from graph.services.statistics_service import StatisticsService
 
-
+""" Tests for network statistics operations. This module contains tests for total users, total friendships, average degree, most connected users, largest components, and complete network statistics reports. """
 def test_total_users():
     # TODO: test total users count
     pass

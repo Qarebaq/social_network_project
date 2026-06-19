@@ -1,4 +1,5 @@
 class TraversalService:
+    """ Graph traversal service. This module contains traversal-related operations such as BFS, DFS, reachability checks, and connected-user discovery. It is used by other services that need to explore the graph structure. """
     def bfs(self, graph, start_user_id):
         # TODO: implement BFS traversal from start_user_id
         pass

@@ -1,5 +1,5 @@
 from graph.services.component_service import ComponentService
-
+""" Tests for connected component operations. This module contains tests for detecting connected components, largest components, isolated users, empty graphs, cyclic graphs, and multiple separate groups. """
 
 def test_empty_graph_components():
     # TODO: test graph with no users

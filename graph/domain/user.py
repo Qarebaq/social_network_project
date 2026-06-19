@@ -1,5 +1,5 @@
 class User:
-
+    """ User domain model. This module defines the User entity, which represents a single vertex in the social network graph. Each user has a unique identifier and a display name. """
     def __init__(self, user_id, name):
         self.user_id = user_id
         self.name = name

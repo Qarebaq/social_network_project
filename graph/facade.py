@@ -8,7 +8,7 @@ from graph.services.advanced_analysis_service import AdvancedAnalysisService
 
 
 class GraphFacade:
-
+    """ Graph facade. This module provides a simplified interface between the controller and the graph services. It delegates requests to the appropriate service classes while hiding the internal structure of the graph analysis layer. """
     def __init__(self, graph):
         self.graph = graph
 

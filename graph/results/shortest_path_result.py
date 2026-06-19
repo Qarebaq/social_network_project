@@ -1,4 +1,5 @@
 class ShortestPathResult:
+    """ Shortest path result model. This module defines the result object returned by shortest path operations. It stores the source user, target user, discovered path, path length, and whether a valid path exists. """
     def __init__(self, source_user_id, target_user_id, path, distance, exists):
         self.source_user_id = source_user_id
         self.target_user_id = target_user_id

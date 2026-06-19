@@ -1,7 +1,5 @@
 class GraphRepository:
-    """
-    Interface for graph storage
-    """
+    """ Graph repository interface. This module defines the common storage interface for saving and loading graph data. Concrete repository implementations should follow this contract. """
 
     def save(self, graph, file_path):
         # TODO: save graph to storage

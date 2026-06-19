@@ -2,6 +2,7 @@ from graph.results.friend_suggestion_result import FriendSuggestionResult
 
 
 class RecommendationService:
+    """ Friend recommendation service. This module provides operations for suggesting new friends to a user. Suggestions are based on graph relationships such as friends of friends and mutual friends. """
     def suggest_friends(self, graph, user_id):
         # TODO: suggest friends for a user
         pass

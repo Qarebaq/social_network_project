@@ -3,7 +3,7 @@ from graph.domain.friendship import Friendship
 
 
 class Graph:
-
+    """ Graph domain model. This module contains the main Graph class responsible for storing users, friendships, and adjacency information. It provides core operations for adding, removing, updating, and querying users and friendships. """
     def __init__(self):
         self.users = {}
         self.adjacency_list = {}

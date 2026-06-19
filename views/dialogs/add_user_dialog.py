@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QDialog
 
 
 class AddUserDialog(QDialog):
-
+    """ Add user dialog. This module defines a Qt dialog for collecting the information needed to create a new user, including the user identifier and display name. """
 
     def __init__(self, parent=None):
         super().__init__(parent)

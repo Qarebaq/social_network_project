@@ -1,4 +1,5 @@
 class DistanceReport:
+    """ Distance report result model. This module defines the result object for distance analysis from a selected user to all other users. It stores reachable distances, unreachable users, and sorted distance information. """
     def __init__(self, source_user_id, distances, unreachable_users):
         self.source_user_id = source_user_id
         self.distances = distances
