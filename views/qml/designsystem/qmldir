@@ -1,0 +1,5 @@
+module DesignSystem
+singleton Colors 1.0 Colors.qml
+singleton Layout 1.0 Layout.qml
+singleton Icons 1.0 Icons.qml
+singleton Typography 1.0 Typography.qml
