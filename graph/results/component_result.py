@@ -4,13 +4,12 @@ class ComponentResult:
         self.members = members
 
     def get_members(self):
-        # TODO: return component members
-        pass
+        # return component members
+        return list(self.members)
 
     def get_size(self):
-        # TODO: return number of members
-        pass
-
+        # return number of members
+        return len(self.members)
     def contains(self, user_id):
-        # TODO: check if user_id exists in this component
-        pass
+        # check if user_id exists in this component
+        return user_id in self.members
