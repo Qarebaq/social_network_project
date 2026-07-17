@@ -5,19 +5,9 @@ import "pages"
 /*
     App.qml
     -------
-    The actual top-level window. Previously Main.qml itself was the
-    ApplicationWindow AND the whole login screen in one 870-line file,
-    which made it impossible to ever show a second screen. Now:
-
-        App.qml            -> the ApplicationWindow + StackView (this file)
-        pages/LoginPage.qml -> exactly the old Main.qml content, unchanged,
-                               just turned into an embeddable Item that
-                               emits loginSucceeded() instead of directly
-                               owning the window
-        pages/DashboardPage.qml -> the new screen
-
-    Point main.py (or whatever loads QML today) at THIS file instead of
-    the old Main.qml. See the PDF for the one-line change needed there.
+    Login page removed - the app now opens straight into the Dashboard.
+    LoginPage.qml is still sitting in pages/ untouched in case you want
+    it back later; it's just no longer referenced from here.
 */
 ApplicationWindow {
     id: window
@@ -30,10 +20,8 @@ ApplicationWindow {
     StackView {
         id: stack
         anchors.fill: parent
-        initialItem: loginPageComponent
+        initialItem: dashboardPageComponent
 
-        // Simple fade between screens instead of the default slide,
-        // since both screens are full-bleed dark backgrounds already.
         pushEnter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 220 } }
         pushExit:  Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 220 } }
         popEnter:  Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 220 } }
@@ -41,20 +29,10 @@ ApplicationWindow {
     }
 
     Component {
-        id: loginPageComponent
-        LoginPage {
-            width: stack.width
-            height: stack.height
-            onLoginSucceeded: stack.replace(dashboardPageComponent)
-        }
-    }
-
-    Component {
         id: dashboardPageComponent
         DashboardPage {
             width: stack.width
             height: stack.height
-            onLogoutRequested: stack.replace(loginPageComponent)
 
             // TODO: wire these to the real controller once the Python
             // bridge is connected (see PDF, section "Controller wiring").
