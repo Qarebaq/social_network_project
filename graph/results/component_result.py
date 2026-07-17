@@ -1,16 +1,15 @@
 class ComponentResult:
     """ Connected component result model. This module defines the result object for a connected component in the social network graph. It stores the members of a friendship group and provides access to component-related information. """
     def __init__(self, members):
-        self.members = members
-
+        self.members = list(members)
+        
     def get_members(self):
-        # TODO: return component members
-        pass
+        # return component members
+        return list(self.members)
 
     def get_size(self):
-        # TODO: return number of members
-        pass
-
+        # return number of members
+        return len(self.members)
     def contains(self, user_id):
-        # TODO: check if user_id exists in this component
-        pass
+        # check if user_id exists in this component
+        return user_id in self.members
