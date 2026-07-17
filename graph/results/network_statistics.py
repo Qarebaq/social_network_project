@@ -17,25 +17,27 @@ class NetworkStatistics:
         self.maximum_degree = maximum_degree
 
     def get_total_users(self):
-        # TODO: return total users count
-        pass
+        # return total users count
+        return self.total_users
 
     def get_total_friendships(self):
-        # TODO: return total friendships count
-        pass
+        # return total friendships count
+        return self.total_friendships
 
     def get_average_degree(self):
-        # TODO: return average degree
-        pass
+        # return average degree
+        return self.average_degree
 
     def get_largest_components(self):
-        # TODO: return largest connected components
-        pass
+        # return largest connected components
+        return list(self.largest_components)
+
 
     def get_most_connected_users(self):
-        # TODO: return users with maximum degree
-        pass
+        # return users with maximum degree
+        return list(self.most_connected_users)
+
 
     def get_maximum_degree(self):
-        # TODO: return maximum degree
-        pass
+        # return maximum degree
+        return self.maximum_degree
