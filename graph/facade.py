@@ -33,20 +33,20 @@ class GraphFacade:
     # Person C
 
     def get_components(self):
-        # TODO: call ComponentService.get_components
-        pass
+        # call ComponentService.get_components
+        return self.component_service.get_components(self.graph)
 
     def get_largest_components(self):
-        # TODO: call ComponentService.get_largest_components
-        pass
-
+        # call ComponentService.get_largest_components
+        return self.component_service.get_largest_components(self.graph)
+    
     def get_most_connected_users(self):
-        # TODO: call StatisticsService.get_most_connected_users
-        pass
+        # call StatisticsService.get_most_connected_users
+        return self.statistics_service.get_most_connected_users(self.graph)
 
     def get_graph_statistics(self):
-        # TODO: call StatisticsService.get_graph_info
-        pass
+        # call StatisticsService.get_graph_info
+        return self.statistics_service.get_graph_info(self.graph)
 
     # Person D
 
