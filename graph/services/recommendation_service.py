@@ -2,23 +2,60 @@ from graph.results.friend_suggestion_result import FriendSuggestionResult
 
 
 class RecommendationService:
-    """ Friend recommendation service. This module provides operations for suggesting new friends to a user. Suggestions are based on graph relationships such as friends of friends and mutual friends. """
+    """Friend recommendation service."""
+
     def suggest_friends(self, graph, user_id):
-        # TODO: suggest friends for a user
-        pass
+
+        candidates = self.get_friends_of_friends(graph, user_id)
+        candidates = self._remove_invalid_candidates(graph, user_id, candidates)
+
+        result = []
+
+        for candidate in candidates:
+
+            mutual_friends = self.get_mutual_friends(graph, user_id, candidate)
+            score = self.calculate_suggestion_score(graph, user_id, candidate)
+
+            result.append(
+                FriendSuggestionResult(
+                    suggested_user_id=candidate,
+                    mutual_friends=mutual_friends,
+                    score=score
+                )
+            )
+
+        result.sort(key=lambda item: item.score, reverse=True)
+
+        return result
 
     def get_friends_of_friends(self, graph, user_id):
-        # TODO: return friends of user's friends
-        pass
+
+        candidates = set()
+
+        friends = graph.get_friends(user_id)
+
+        for friend in friends:
+            candidates.update(graph.get_friends(friend))
+
+        return candidates
 
     def get_mutual_friends(self, graph, user1_id, user2_id):
-        # TODO: return mutual friends between two users
-        pass
+
+        friends1 = set(graph.get_friends(user1_id))
+        friends2 = set(graph.get_friends(user2_id))
+
+        return list(friends1 & friends2)
 
     def calculate_suggestion_score(self, graph, user_id, candidate_user_id):
-        # TODO: calculate score based on mutual friends or other criteria
-        pass
+
+        return len(self.get_mutual_friends(graph, user_id, candidate_user_id))
 
     def _remove_invalid_candidates(self, graph, user_id, candidates):
-        # TODO: remove self and existing friends from candidates
-        pass
+
+        candidates = set(candidates)
+
+        candidates.discard(user_id)
+
+        friends = set(graph.get_friends(user_id))
+
+        return candidates - friends
