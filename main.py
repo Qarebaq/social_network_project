@@ -79,6 +79,14 @@ class QmlBridge(QObject):
     def addFriendship(self, user1_id, user2_id):
         self._run(lambda: self._controller.handle_add_friendship(user1_id, user2_id))
 
+    @Slot(str)
+    def removeUser(self, user_id):
+        self._run(lambda: self._controller.handle_remove_user(user_id))
+
+    @Slot(str, str)
+    def removeFriendship(self, user1_id, user2_id):
+        self._run(lambda: self._controller.handle_remove_friendship(user1_id, user2_id))
+
     @Slot(str, str)
     def checkConnection(self, user1_id, user2_id):
         self._run(lambda: self._controller.handle_check_connection(user1_id, user2_id))
@@ -142,6 +150,7 @@ def main():
         main_window=bridge,
     )
     bridge.set_controller(controller)
+    controller.refresh_all_views()
 
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty("bridge", bridge)
