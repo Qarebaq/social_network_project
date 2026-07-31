@@ -12,9 +12,13 @@ class RecommendationService:
         pass
 
     def get_mutual_friends(self, graph, user1_id, user2_id):
-        # TODO: return mutual friends between two users
-        pass
+        graph.validate_user_exists(user1_id)
+        graph.validate_user_exists(user2_id)
 
+        mutual = set(graph.get_friends(user1_id)) & set(graph.get_friends(user2_id))
+
+        return sorted(mutual, key=lambda user: user.get_id())
+    
     def calculate_suggestion_score(self, graph, user_id, candidate_user_id):
         # TODO: calculate score based on mutual friends or other criteria
         pass
