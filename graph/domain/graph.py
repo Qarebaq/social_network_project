@@ -50,13 +50,16 @@ class Graph:
         pass
 
     def get_friends(self, user_id):
-        # TODO: return friends of user
-        pass
+        #adjacency_list assumed : {"1": {"2", "3"}}
+        self.validate_user_exists(user_id)
 
-    def get_neighbors(self, user_id):
-        # TODO: return neighbor ids
-        pass
+        friends = []
 
+        for friendship in self.adjacency_list[user_id]:
+            friend_id = friendship.get_other_user(user_id)
+            friends.append(self.users[friend_id])
+
+        return friends
     def get_friendships(self):
         # TODO: return all friendships
         pass
