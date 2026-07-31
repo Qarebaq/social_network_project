@@ -1,5 +1,6 @@
 from graph.domain.user import User
 from graph.domain.friendship import Friendship
+from graph.exceptions.graph_exceptions import UserNotFoundException
 
 
 class Graph:
@@ -26,8 +27,7 @@ class Graph:
         pass
 
     def has_user(self, user_id):
-        # TODO: check user existence
-        pass
+        return user_id in self.users
 
     def get_users(self):
         # TODO: return all user ids or User objects
@@ -54,8 +54,8 @@ class Graph:
         pass
 
     def get_neighbors(self, user_id):
-        # TODO: return neighbor ids
-        pass
+        self.validate_user_exists(user_id)
+        return list(self.adjacency_list.get(user_id, []))
 
     def get_friendships(self):
         # TODO: return all friendships
@@ -78,8 +78,10 @@ class Graph:
         pass
 
     def validate_user_exists(self, user_id):
-        # TODO: raise exception if user does not exist
-        pass
+        if not self.has_user(user_id):
+            raise UserNotFoundException(
+                f"User {user_id} does not exist"
+            )
 
     def validate_friendship_allowed(self, user1_id, user2_id):
         # TODO: validate friendship rules

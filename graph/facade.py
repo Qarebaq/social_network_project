@@ -51,12 +51,16 @@ class GraphFacade:
     # Person D
 
     def suggest_friends(self, user_id):
-        # TODO: call RecommendationService.suggest_friends
-        pass
+        return self.recommendation_service.suggest_friends(
+            self.graph,
+            user_id
+        )
 
     def get_distances_from_user(self, source_user_id):
-        # TODO: call DistanceService.get_distances_from_user
-        pass
+        return self.distance_service.get_distances_from_user(
+            self.graph,
+            source_user_id
+        )
 
     # Optional
 
