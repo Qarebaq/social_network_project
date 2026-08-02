@@ -7,40 +7,46 @@ class Friendship:
 
     def get_user1_id(self):
         # TODO: return first user id
-        pass
+        return self.user1_id
 
     def get_user2_id(self):
         # TODO: return second user id
-        pass
+        return self.user2_id
 
     def get_weight(self):
         # TODO: return friendship weight
-        pass
+        return self.weight
 
     def contains_user(self, user_id):
         # TODO: check if user is part of friendship
-        pass
+        return user_id == self.user1_id or user_id == self.user2_id
 
     def get_other_user(self, user_id):
         # TODO: return the other user id
-        pass
+        if user_id == self.user1_id:
+            return self.user2_id
+        if user_id == self.user2_id:
+            return self.user1_id
+        raise ValueError(f"User {user_id!r} is not part of this friendship")
 
     def connects(self, user1_id, user2_id):
         # TODO: check if friendship connects two users
-        pass
+        return self.normalized_key() == frozenset((user1_id, user2_id))
 
     def normalized_key(self):
         # TODO: return sorted tuple for undirected friendship
-        pass
+        return frozenset((self.user1_id, self.user2_id))
 
     def __eq__(self, other):
         # TODO: compare friendships as undirected edges
-        pass
+        if not isinstance(other, Friendship):
+            return NotImplemented
+        return self.normalized_key() == other.normalized_key()
 
     def __hash__(self):
         # TODO: hash friendship by normalized key
-        pass
+        return hash(self.normalized_key())
 
     def __str__(self):
         # TODO: return readable friendship info
-        pass
+        return f"Friendship({self.user1_id!r}, {self.user2_id!r}, weight={self.weight!r})"
