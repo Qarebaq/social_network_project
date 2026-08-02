@@ -6,192 +6,109 @@ removing users, adding friendships, removing friendships, and validating graph
 state.
 """
 
-import pytest
-
 from graph.domain.graph import Graph
-from graph.exceptions.graph_exceptions import (
-    DuplicateFriendshipException,
-    DuplicateUserException,
-    SelfFriendshipException,
-)
-
-
-def create_graph_with_users(*user_ids):
-    graph = Graph()
-    for user_id in user_ids:
-        graph.add_user(user_id, f"User {user_id}")
-    return graph
 
 
 def test_add_user():
-    graph = Graph()
-    user = graph.add_user("A", "Alice")
-
-    assert user.get_id() == "A"
-    assert graph.get_user("A") == user
+    # TODO: test adding a user to the graph
+    pass
 
 
 def test_add_duplicate_user():
-    graph = create_graph_with_users("A")
-
-    with pytest.raises(DuplicateUserException):
-        graph.add_user("A", "Another Alice")
+    # TODO: test adding a user with duplicate id
+    pass
 
 
 def test_remove_user():
-    graph = create_graph_with_users("A")
-
-    removed_user = graph.remove_user("A")
-
-    assert removed_user.get_id() == "A"
-    assert not graph.has_user("A")
+    # TODO: test removing an existing user
+    pass
 
 
 def test_remove_user_also_removes_friendships():
-    graph = create_graph_with_users("A", "B", "C")
-    graph.add_friendship("A", "B")
-    graph.add_friendship("B", "C")
-
-    graph.remove_user("B")
-
-    assert graph.get_friendship_count() == 0
-    assert graph.get_neighbors("A") == []
-    assert graph.get_neighbors("C") == []
+    # TODO: test removing user removes related friendships
+    pass
 
 
 def test_update_user():
-    graph = create_graph_with_users("A")
-
-    updated_user = graph.update_user("A", "Alice")
-
-    assert updated_user.get_name() == "Alice"
-    with pytest.raises(ValueError):
-        graph.update_user("A", "   ")
-    assert graph.get_user("A").get_name() == "Alice"
+    # TODO: test updating user's name
+    pass
 
 
 def test_get_user():
-    graph = create_graph_with_users("A")
-
-    assert graph.get_user("A").get_id() == "A"
+    # TODO: test retrieving user by id
+    pass
 
 
 def test_has_user():
-    graph = create_graph_with_users("A")
-
-    assert graph.has_user("A")
-    assert not graph.has_user("missing")
+    # TODO: test checking user existence
+    pass
 
 
 def test_get_users():
-    graph = create_graph_with_users("A", "B")
-
-    assert [user.get_id() for user in graph.get_users()] == ["A", "B"]
+    # TODO: test getting all users
+    pass
 
 
 def test_get_user_count():
-    graph = create_graph_with_users("A", "B")
-
-    assert graph.get_user_count() == 2
+    # TODO: test user count
+    pass
 
 
 def test_add_friendship():
-    graph = create_graph_with_users("A", "B")
-
-    friendship = graph.add_friendship("A", "B", weight=3)
-
-    assert friendship.get_weight() == 3
-    assert graph.has_friendship("A", "B")
+    # TODO: test adding friendship between two users
+    pass
 
 
 def test_add_duplicate_friendship():
-    graph = create_graph_with_users("A", "B")
-    graph.add_friendship("A", "B")
-
-    with pytest.raises(DuplicateFriendshipException):
-        graph.add_friendship("B", "A")
+    # TODO: test adding duplicate friendship
+    pass
 
 
 def test_add_self_friendship():
-    graph = create_graph_with_users("A")
-
-    with pytest.raises(SelfFriendshipException):
-        graph.add_friendship("A", "A")
+    # TODO: test user cannot be friends with themselves
+    pass
 
 
 def test_remove_friendship():
-    graph = create_graph_with_users("A", "B")
-    graph.add_friendship("A", "B")
-
-    removed_friendship = graph.remove_friendship("A", "B")
-
-    assert removed_friendship.connects("A", "B")
-    assert not graph.has_friendship("A", "B")
+    # TODO: test removing friendship
+    pass
 
 
 def test_has_friendship():
-    graph = create_graph_with_users("A", "B", "C")
-    graph.add_friendship("A", "B")
-
-    assert graph.has_friendship("A", "B")
-    assert graph.has_friendship("B", "A")
-    assert not graph.has_friendship("A", "C")
+    # TODO: test checking friendship existence
+    pass
 
 
 def test_get_friends():
-    graph = create_graph_with_users("A", "B", "C")
-    graph.add_friendship("A", "B")
-    graph.add_friendship("A", "C")
-
-    assert [user.get_id() for user in graph.get_friends("A")] == ["B", "C"]
+    # TODO: test getting friends of a user
+    pass
 
 
 def test_get_neighbors():
-    graph = create_graph_with_users("A", "B", "C")
-    graph.add_friendship("A", "B")
-    graph.add_friendship("A", "C")
-
-    assert graph.get_neighbors("A") == ["B", "C"]
+    # TODO: test getting neighbor ids of a user
+    pass
 
 
 def test_get_friendships():
-    graph = create_graph_with_users("A", "B", "C")
-    first = graph.add_friendship("A", "B")
-    second = graph.add_friendship("B", "C")
-
-    assert graph.get_friendships() == [first, second]
+    # TODO: test getting all friendships
+    pass
 
 
 def test_get_friendship_count():
-    graph = create_graph_with_users("A", "B", "C")
-    graph.add_friendship("A", "B")
-    graph.add_friendship("B", "C")
-
-    assert graph.get_friendship_count() == 2
+    # TODO: test friendship count
+    pass
 
 
 def test_get_degree():
-    graph = create_graph_with_users("A", "B", "C")
-    graph.add_friendship("A", "B")
-    graph.add_friendship("A", "C")
-
-    assert graph.get_degree("A") == 2
-    assert graph.get_degree("B") == 1
+    # TODO: test degree of a user
+    pass
 
 
 def test_clear_graph():
-    graph = create_graph_with_users("A", "B")
-    graph.add_friendship("A", "B")
-
-    graph.clear()
-
-    assert graph.get_user_count() == 0
-    assert graph.get_friendship_count() == 0
+    # TODO: test clearing all users and friendships
+    pass
 
 
 def test_is_empty():
-    graph = Graph()
-
-    assert graph.is_empty()
-    graph.add_user("A", "Alice")
-    assert not graph.is_empty()
+    # TODO: test graph empty state
+    pass

@@ -5,30 +5,29 @@ class User:
         self.name = name
 
     def get_id(self):
-        return self.user_id
+        # TODO: return user id
+        pass
 
     def get_name(self):
         # TODO: return user name
-        return self.name
+        pass
 
     def rename(self, new_name):
         # TODO: update user name
-        self.name = new_name
+        pass
 
     def is_valid(self):
         # TODO: validate user data
-        return self.user_id is not None and self.user_id != "" and isinstance(self.name, str) and bool(self.name.strip())
+        pass
 
     def __eq__(self, other):
         # TODO: compare users by id
-        if not isinstance(other, User):
-            return NotImplemented
-        return self.user_id == other.user_id
+        pass
 
     def __hash__(self):
         # TODO: hash user by id
-        return hash(self.user_id)
+        pass
 
     def __str__(self):
         # TODO: return readable user info
-        return f"User(id={self.user_id!r}, name={self.name!r})"
+        pass
