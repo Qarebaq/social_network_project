@@ -38,9 +38,9 @@ class Graph:
     def update_user(self, user_id, new_name):
         # TODO: update user name
         user = self.get_user(user_id)
-        user.rename(new_name)
-        if not user.is_valid():
+        if not isinstance(new_name, str) or not new_name.strip():
             raise ValueError("User name must be non-empty")
+        user.rename(new_name)
         return user
 
     def get_user(self, user_id):
