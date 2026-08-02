@@ -1,25 +1,41 @@
+from graph.domain.graph import Graph
 from graph.services.shortest_path_service import ShortestPathService
-""" Tests for the Graph domain model. This module contains tests for core graph operations such as adding users, removing users, adding friendships, removing friendships, and validating graph state. """
-def test_shortest_path_exists():
-    # TODO: test shortest path when path exists
-    pass
 
 
-def test_shortest_path_not_exists():
-    # TODO: test shortest path when no path exists
-    pass
+def build_graph():
+    graph = Graph()
+    for user_id in "ABCDE":
+        graph.add_user(user_id, user_id)
+    for edge in (("A", "B"), ("B", "C"), ("A", "D"), ("D", "C")):
+        graph.add_friendship(*edge)
+    return graph
 
 
-def test_shortest_path_same_user():
-    # TODO: test source and target are same user
-    pass
+def test_shortest_path_result_has_complete_contract():
+    result = ShortestPathService().find_shortest_path(build_graph(), "A", "C")
+    assert result.get_source_user_id() == "A"
+    assert result.get_target_user_id() == "C"
+    assert [user.get_id() for user in result.get_path()] == ["A", "B", "C"]
+    assert result.get_distance() == 2
+    assert result.path_exists()
 
 
-def test_shortest_path_distance():
-    # TODO: test correct shortest distance
-    pass
+def test_unreachable_path():
+    result = ShortestPathService().find_shortest_path(build_graph(), "A", "E")
+    assert result.get_path() == []
+    assert result.get_distance() == -1
+    assert not result.path_exists()
 
 
-def test_multiple_shortest_paths():
-    # TODO: test graph with multiple valid shortest paths
-    pass
+def test_path_from_user_to_itself():
+    result = ShortestPathService().find_shortest_path(build_graph(), "A", "A")
+    assert [user.get_id() for user in result.get_path()] == ["A"]
+    assert result.get_distance() == 0 and result.path_exists()
+
+
+def test_distance_and_has_path_helpers():
+    graph = build_graph()
+    service = ShortestPathService()
+    assert service.get_distance_between(graph, "A", "C") == 2
+    assert service.has_path(graph, "A", "C")
+    assert not service.has_path(graph, "A", "E")
