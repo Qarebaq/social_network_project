@@ -32,6 +32,15 @@ def test_duplicate_and_missing_users_raise_domain_exceptions():
         graph.get_user("missing")
 
 
+def test_invalid_update_does_not_mutate_user():
+    graph = graph_with_users("A")
+
+    with pytest.raises(ValueError):
+        graph.update_user("A", "   ")
+
+    assert graph.get_user("A").get_name() == "User A"
+
+
 def test_friendship_contracts():
     graph = graph_with_users("A", "B", "C")
     friendship = graph.add_friendship("A", "B", weight=3)
