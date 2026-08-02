@@ -9,20 +9,20 @@ class ShortestPathResult:
 
     def get_source_user_id(self):
         # TODO: return source user id
-        return self.source_user_id
+        pass
 
     def get_target_user_id(self):
         # TODO: return target user id
-        return self.target_user_id
+        pass
 
     def get_path(self):
         # TODO: return shortest path
-        return self.path
+        pass
 
     def get_distance(self):
         # TODO: return path distance
-        return self.distance
+        pass
 
     def path_exists(self):
         # TODO: return whether path exists
-        return self.exists
+        pass

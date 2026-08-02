@@ -16,11 +16,8 @@ class ShortestPathService:
 
         if source_user_id == target_user_id:
             return ShortestPathResult(
-                source_user_id,
-                target_user_id,
                 [graph.get_user(source_user_id)],
-                0,
-                True,
+                0
             )
 
         queue = deque([source_user_id])
@@ -45,16 +42,13 @@ class ShortestPathService:
                     )
 
                     return ShortestPathResult(
-                        source_user_id,
-                        target_user_id,
                         [graph.get_user(uid) for uid in path],
                         len(path) - 1,
-                        True,
                     )
 
                 queue.append(neighbor)
 
-        return ShortestPathResult(source_user_id, target_user_id, [], -1, False)
+        return ShortestPathResult([], -1)
 
     def has_path(self, graph, source_user_id, target_user_id):
         return self.get_distance_between(
