@@ -1,7 +1,9 @@
-from graph.domain.graph import Graph
-from graph.services.statistics_service import StatisticsService
 import pytest
-""" Tests for network statistics operations. This module contains tests for total users, total friendships, average degree, most connected users, largest components, and complete network statistics reports. """
+
+from graph.domain.graph import Graph
+from graph.facade import GraphFacade
+from graph.services.statistics_service import StatisticsService
+
 
 def build_graph(user_ids, friendships=()):
     graph = Graph()
@@ -10,8 +12,6 @@ def build_graph(user_ids, friendships=()):
     for user1_id, user2_id in friendships:
         graph.add_friendship(user1_id, user2_id)
     return graph
-
-
 
 
 def test_total_users():
@@ -58,10 +58,24 @@ def test_most_connected_users_tie():
     }
 
 
-def test_empty_graph_has_no_most_connected_user():
+def test_all_isolated_users_tie_at_zero_degree():
+    graph = build_graph(["A", "B", "C"])
     service = StatisticsService()
-    assert service.get_most_connected_users(Graph()) == []
-    assert service.get_maximum_degree(Graph()) == 0
+
+    assert set(service.get_most_connected_users(graph)) == {"A", "B", "C"}
+    assert service.get_maximum_degree(graph) == 0
+
+
+def test_empty_graph_statistics_are_well_defined():
+    service = StatisticsService()
+    info = service.get_graph_info(Graph())
+
+    assert info.get_total_users() == 0
+    assert info.get_total_friendships() == 0
+    assert info.get_average_degree() == 0.0
+    assert info.get_maximum_degree() == 0
+    assert info.get_most_connected_users() == []
+    assert info.get_largest_components() == []
 
 
 def test_graph_info():
@@ -79,3 +93,26 @@ def test_graph_info():
     assert info.get_most_connected_users() == ["B"]
     assert len(info.get_largest_components()) == 1
     assert set(info.get_largest_components()[0].get_members()) == {"A", "B", "C"}
+
+
+def test_facade_statistics_match_service_results():
+    graph = build_graph(
+        ["A", "B", "C", "D"],
+        [("A", "B"), ("A", "C")]
+    )
+    facade = GraphFacade(graph)
+    service_info = StatisticsService().get_graph_info(graph)
+    facade_info = facade.get_graph_statistics()
+
+    assert facade_info.get_total_users() == service_info.get_total_users()
+    assert facade_info.get_total_friendships() == service_info.get_total_friendships()
+    assert facade_info.get_average_degree() == service_info.get_average_degree()
+    assert facade_info.get_maximum_degree() == service_info.get_maximum_degree()
+    assert facade_info.get_most_connected_users() == service_info.get_most_connected_users()
+    assert {
+        frozenset(component.get_members())
+        for component in facade_info.get_largest_components()
+    } == {
+        frozenset(component.get_members())
+        for component in service_info.get_largest_components()
+    }
