@@ -5,7 +5,7 @@ and provides a Qt/QML interface for exploring it.
 
 ## Features
 
-- Add, update, and remove users
+- Add and remove users
 - Add and remove friendships
 - Check connectivity and find shortest paths
 - Find connected components and the largest friendship group
