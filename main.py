@@ -1,5 +1,15 @@
+import os
 import sys
 from pathlib import Path
+
+# Must be set before QGuiApplication is created. Without an explicit style,
+# Qt Quick Controls falls back to the native platform style (e.g. Windows/
+# WindowsVista/Fusion), which paints its own pressed/hover state on top of
+# buttons - on Windows in particular this shows up as a white flash when a
+# button is clicked, even though Btn.qml/IconButton.qml define a custom
+# "background". "Basic" is a pure-QML style, so it always renders exactly
+# the colors defined in the QML files below and nothing else.
+os.environ.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
 
 from PySide6.QtCore import QObject, Signal, Slot, Property, QUrl
 from PySide6.QtGui import QGuiApplication

@@ -20,7 +20,7 @@ Button {
 
     background: Rectangle {
         radius: DS.Layout.radi_m
-                opacity: bsbutton.enabled ? 1 : 0.3
+                opacity: root.enabled ? 1 : 0.3
             Behavior on color {
                 ColorAnimation {
                     duration: 150
@@ -33,17 +33,15 @@ Button {
         color: {
             if (root.isPrimary) return "transparent"; // gradient handles it
             if (root.isDanger)  return root.down ? Qt.darker(DS.Colors.danger, 1.15) : DS.Colors.danger;
-            if (root.isGhost)   return root.hovered ? DS.Colors.surfaceAlt : "transparent";
-            return root.hovered ? DS.Colors.surfaceRaised : DS.Colors.surfaceAlt; // secondary
+            if (root.isGhost)   return root.down ? DS.Colors.surfaceRaised : (root.hovered ? DS.Colors.surfaceAlt : "transparent");
+            return root.down ? DS.Colors.borderStrong : (root.hovered ? DS.Colors.surfaceRaised : DS.Colors.surfaceAlt); // secondary
         }
-    
-        
-        
+
         Gradient {
             id: primaryGradient
             orientation: Gradient.Horizontal
-            GradientStop { position: 0.0; color: root.hovered ? DS.Colors.accentGradTop : DS.Colors.accentStrong }
-            GradientStop { position: 1.0; color: root.hovered ? DS.Colors.accentGradBot : DS.Colors.accentSoft }
+            GradientStop { position: 0.0; color: root.down ? Qt.darker(DS.Colors.accentStrong, 1.2) : (root.hovered ? DS.Colors.accentGradTop : DS.Colors.accentStrong) }
+            GradientStop { position: 1.0; color: root.down ? Qt.darker(DS.Colors.accentSoft, 1.2) : (root.hovered ? DS.Colors.accentGradBot : DS.Colors.accentSoft) }
         }
 
         Behavior on color { ColorAnimation { duration: 120 } }

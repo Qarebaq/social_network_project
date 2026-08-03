@@ -838,13 +838,19 @@ Item {
                 wrapMode: Text.WordWrap
                 width: parent.width
             }
+            Text {
+                text: "File"
+                font: DS.Typography.label
+                color: DS.Colors.textSecondary
+            }
             Row {
+                id: fileRow
                 width: parent.width
                 spacing: DS.Layout.s_mm
+
                 AppTextField {
                     id: loadPath
-                    width: parent.width - attachBtn.width - parent.spacing
-                    label: "File"
+                    width: fileRow.width - attachBtn.width - fileRow.spacing
                     placeholderText: "e.g. my_network.json"
                 }
                 Btn {

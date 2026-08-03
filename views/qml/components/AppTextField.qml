@@ -33,7 +33,7 @@ Column {
 
     TextField {
         id: field
-        width: parent.width
+        width: parent.width 
         implicitHeight: DS.Layout.h_ml
         font: DS.Typography.body
         color: DS.Colors.textPrimary

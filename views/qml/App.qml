@@ -14,12 +14,21 @@ ApplicationWindow {
     StackView {
         id: stack
         anchors.fill: parent
-        initialItem: dashboardPageComponent
+        initialItem: landingPageComponent
 
         pushEnter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 220 } }
         pushExit:  Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 220 } }
         popEnter:  Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 220 } }
         popExit:   Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: 220 } }
+    }
+
+    Component {
+        id: landingPageComponent
+        LandingPage {
+            width: stack.width
+            height: stack.height
+            onEnterDashboardRequested: stack.push(dashboardPageComponent)
+        }
     }
 
     Component {
@@ -30,6 +39,7 @@ ApplicationWindow {
 
             onAddUserRequested: console.log("Add User dialog opened")
             onAddFriendshipRequested: console.log("Add Friendship dialog opened")
+            onLogoutRequested: stack.pop(null)
             onNavigateRequested: function(section) {
                 if (section === "users") {
                     stack.push(usersPageComponent, { initialUsers: liveUsers });

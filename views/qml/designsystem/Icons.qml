@@ -14,16 +14,14 @@ import QtQuick 2.15
     Usage:
         AppIcon { name: "dashboard" }   // see components/AppIcon.qml
 */
-
 QtObject {
+    readonly property url logalanding:  "views/qml/designsystem/images/74d07667-77dd-4b5f-95b6-2dd1f29087ab.png"
+
     readonly property var names: ([
         "dashboard", "network", "people", "communities", "shield",
         "search", "bell", "plus", "chevronRight", "gear",
         "help", "export", "check", "person", "lock", "eye"
     ])
-
-    // Plain-text fallback glyphs, used only if an unknown/unregistered
-    // icon name is requested (keeps the UI from silently breaking).
     readonly property var glyphs: ({
         "dashboard"   : "▦",
         "network"     : "◇",
