@@ -2,7 +2,8 @@ from graph.results.component_result import ComponentResult
 
 
 class ComponentService:
-    """ Connected component service. This module provides operations for finding connected components in the social network graph. Components represent separate friendship groups inside the network. """
+    """Find connected components (separate friendship groups) in a graph."""
+
     def get_components(self, graph):
         visited = set()
         components = []
@@ -35,6 +36,7 @@ class ComponentService:
         return len(self.get_components(graph))
 
     def _dfs(self, graph, start_user_id, visited):
+        """Return one component using iterative DFS in O(V + E) time."""
         members = []
         stack = [start_user_id]
 
