@@ -23,12 +23,12 @@ class GraphFacade:
     # Person B
 
     def is_connected(self, user1_id, user2_id):
-        # TODO: call TraversalService.is_connected
-        pass
+        # call TraversalService.is_connected
+        return self.traversal_service.is_connected(self.graph, user1_id, user2_id)
 
     def get_shortest_path(self, source_user_id, target_user_id):
-        # TODO: call ShortestPathService.find_shortest_path
-        pass
+        # call ShortestPathService.find_shortest_path
+        return self.shortest_path_service.find_shortest_path(self.graph, source_user_id, target_user_id)
 
     # Person C
 
@@ -51,12 +51,12 @@ class GraphFacade:
     # Person D
 
     def suggest_friends(self, user_id):
-        # TODO: call RecommendationService.suggest_friends
-        pass
+        # call RecommendationService.suggest_friends
+        return self.recommendation_service.suggest_friends(self.graph, user_id)
 
     def get_distances_from_user(self, source_user_id):
-        # TODO: call DistanceService.get_distances_from_user
-        pass
+        # call DistanceService.get_distances_from_user
+        return self.distance_service.get_distances_from_user(self.graph, source_user_id)
 
     # Optional
 

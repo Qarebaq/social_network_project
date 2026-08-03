@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QObject, Signal, Slot
+from PySide6.QtCore import QObject, Signal, Slot, Property, QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
@@ -10,6 +10,10 @@ from graph.facade import GraphFacade
 from persistence.json_graph_repository import JsonGraphRepository
 
 from controllers.main_controller import MainController
+
+# All saved/loaded graphs live in this single, fixed folder so users never
+# have to type a full path - only a name (Save) or pick a file (Load).
+DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
 class QmlBridge(QObject):
@@ -34,6 +38,15 @@ class QmlBridge(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._controller = None
+
+    # ---- data folder (used by QML's Load Graph file picker) -----------
+    @Property(QUrl, constant=True)
+    def dataDirectoryUrl(self):
+        return QUrl.fromLocalFile(str(DATA_DIR))
+
+    @Slot(QUrl, result=str)
+    def toLocalFile(self, url):
+        return url.toLocalFile()
 
     # ---- called by MainController ------------------------------------
     def set_controller(self, controller):
@@ -78,6 +91,14 @@ class QmlBridge(QObject):
     @Slot(str, str)
     def addFriendship(self, user1_id, user2_id):
         self._run(lambda: self._controller.handle_add_friendship(user1_id, user2_id))
+
+    @Slot(str)
+    def removeUser(self, user_id):
+        self._run(lambda: self._controller.handle_remove_user(user_id))
+
+    @Slot(str, str)
+    def removeFriendship(self, user1_id, user2_id):
+        self._run(lambda: self._controller.handle_remove_friendship(user1_id, user2_id))
 
     @Slot(str, str)
     def checkConnection(self, user1_id, user2_id):
@@ -129,6 +150,8 @@ def main():
     (views/qml/App.qml) through a QmlBridge, and starts the event loop. """
 
     app = QGuiApplication(sys.argv)
+
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     graph = Graph()
     facade = GraphFacade(graph)

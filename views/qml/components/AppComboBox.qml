@@ -2,12 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import "../designsystem" as DS
 
-/*
-    AppComboBox
-    -----------
-    Labeled combo box, used e.g. to pick "user 1" / "user 2" when creating
-    a friendship, or the source user for shortest-path / distances.
-*/
+
 Column {
     id: root
     spacing: DS.Layout.s_mm
