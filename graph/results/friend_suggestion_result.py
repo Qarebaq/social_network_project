@@ -6,17 +6,13 @@ class FriendSuggestionResult:
         self.score = score
 
     def get_suggested_user_id(self):
-        # TODO: return suggested user id
-        pass
+        return self.suggested_user_id
 
     def get_mutual_friends(self):
-        # TODO: return mutual friends list
-        pass
+        return list(self.mutual_friends)
 
     def get_mutual_friends_count(self):
-        # TODO: return number of mutual friends
-        pass
+        return len(self.mutual_friends)
 
     def get_score(self):
-        # TODO: return suggestion score
-        pass
+        return self.score

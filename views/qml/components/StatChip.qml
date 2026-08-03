@@ -1,19 +1,12 @@
 import QtQuick 2.15
 import "../designsystem" as DS
 
-/*
-    StatChip
-    --------
-    Small pill used to render one NetworkStatistics field (total_users,
-    average_degree, ...) inside ResultPanel, or a status tag like the
-    "VERIFIED" / "REVIEW_REQUIRED" tags in the dashboard reference design.
-*/
 Rectangle {
     id: root
     property string label: ""
     property string value: ""
     property color accent: DS.Colors.accent
-    property bool solid: false   // true = filled tag style (VERIFIED, etc.)
+    property bool solid: false
 
     radius: DS.Layout.radi_xxl
     color: solid ? Qt.rgba(accent.r, accent.g, accent.b, 0.16) : DS.Colors.surfaceAlt
