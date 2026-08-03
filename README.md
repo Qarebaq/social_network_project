@@ -94,9 +94,9 @@ Maximum-degree and most-connected-user queries scan users and their stored
 degrees, while the complete report is dominated by connected-component
 discovery and therefore runs in `O(V + E)`.
 
-## Person C contribution
+## Qarebaq contribution
 
-Person C owns connected-component analysis and network statistics. The related
+Qarebaq owns connected-component analysis and network statistics. The related
 implementation and tests are primarily located in:
 
 - `graph/services/component_service.py`
