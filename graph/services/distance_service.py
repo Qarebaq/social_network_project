@@ -10,7 +10,6 @@ class DistanceService:
         self._validate_source_user(graph, source_user_id)
 
         distances = self._bfs_distances(graph, source_user_id)
-        distances.pop(source_user_id, None)
 
         unreachable_users = [
             user.get_id()

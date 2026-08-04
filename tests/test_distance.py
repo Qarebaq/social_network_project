@@ -13,6 +13,7 @@ This module tests:
 import pytest
 
 from graph.domain.graph import Graph
+from graph.exceptions.graph_exceptions import UserNotFoundException
 from graph.services.distance_service import DistanceService
 
 
@@ -45,6 +46,7 @@ def test_distances_from_user():
     report = service.get_distances_from_user(graph, 1)
 
     assert report.get_distances() == {
+        1: 0,
         2: 1,
         3: 2
     }
@@ -73,7 +75,7 @@ def test_distance_to_unreachable_users():
 
 def test_distance_from_user_to_self():
     """
-    Source user should not appear in distances.
+    The shortest distance from a user to itself is zero.
     """
 
     graph = create_graph_with_users(1, 2)
@@ -84,8 +86,7 @@ def test_distance_from_user_to_self():
 
     report = service.get_distances_from_user(graph, 1)
 
-    assert 1 not in report.get_distances()
-    assert report.get_distance_to(1) == -1
+    assert report.get_distance_to(1) == 0
 
 
 def test_sorted_distances():
@@ -104,6 +105,7 @@ def test_sorted_distances():
     sorted_distances = service.get_sorted_distances_from_user(graph, 1)
 
     assert sorted_distances == [
+        (1, 0),
         (2, 1),
         (3, 1),
         (4, 2)
@@ -120,7 +122,7 @@ def test_distances_empty_graph():
 
     service = DistanceService()
 
-    with pytest.raises(Exception):
+    with pytest.raises(UserNotFoundException):
         service.get_distances_from_user(graph, 1)
 
 
@@ -133,5 +135,5 @@ def test_invalid_user_distance():
 
     service = DistanceService()
 
-    with pytest.raises(Exception):
+    with pytest.raises(UserNotFoundException):
         service.get_distances_from_user(graph, 99)

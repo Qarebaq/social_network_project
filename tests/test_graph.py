@@ -12,15 +12,11 @@ from graph.domain.graph import Graph
 from graph.exceptions.graph_exceptions import (
     DuplicateFriendshipException,
     DuplicateUserException,
-    SelfFriendshipException,
-)
-from graph.exceptions.graph_exceptions import (
-    DuplicateFriendshipException,
-    DuplicateUserException,
+    FriendshipNotFoundException,
     SelfFriendshipException,
     UserNotFoundException,
-    FriendshipNotFoundException,
 )
+
 
 def create_graph_with_users(*user_ids):
     graph = Graph()
