@@ -1,26 +1,139 @@
+"""
+Tests for distance analysis operations.
+
+This module tests:
+- BFS distance calculation
+- unreachable users
+- distance from user to itself
+- sorted distances
+- empty graph behavior
+- invalid user validation
+"""
+
+import pytest
+
+from graph.domain.graph import Graph
+from graph.exceptions.graph_exceptions import UserNotFoundException
 from graph.services.distance_service import DistanceService
-""" Tests for distance analysis operations. This module contains tests for calculating distances from one user to all other users, handling unreachable users, sorting distances, and processing empty graphs. """
+
+
+def create_graph_with_users(*user_ids):
+    graph = Graph()
+
+    for user_id in user_ids:
+        graph.add_user(user_id, f"User {user_id}")
+
+    return graph
+
 
 def test_distances_from_user():
-    # TODO: test distances from one user to all others
-    pass
+    """
+    Graph:
+        1 -- 2 -- 3
+
+    Expected:
+        1 -> 2 = 1
+        1 -> 3 = 2
+    """
+
+    graph = create_graph_with_users(1, 2, 3)
+
+    graph.add_friendship(1, 2)
+    graph.add_friendship(2, 3)
+
+    service = DistanceService()
+
+    report = service.get_distances_from_user(graph, 1)
+
+    assert report.get_distances() == {
+        1: 0,
+        2: 1,
+        3: 2
+    }
 
 
 def test_distance_to_unreachable_users():
-    # TODO: test unreachable users have infinite or None distance
-    pass
+    """
+    Graph:
+        1 -- 2
+
+        3
+
+    User 3 is unreachable from user 1.
+    """
+
+    graph = create_graph_with_users(1, 2, 3)
+
+    graph.add_friendship(1, 2)
+
+    service = DistanceService()
+
+    report = service.get_distances_from_user(graph, 1)
+
+    assert report.get_unreachable_users() == [3]
 
 
 def test_distance_from_user_to_self():
-    # TODO: test distance from user to self is zero
-    pass
+    """
+    The shortest distance from a user to itself is zero.
+    """
+
+    graph = create_graph_with_users(1, 2)
+
+    graph.add_friendship(1, 2)
+
+    service = DistanceService()
+
+    report = service.get_distances_from_user(graph, 1)
+
+    assert report.get_distance_to(1) == 0
 
 
 def test_sorted_distances():
-    # TODO: test distances are sorted correctly
-    pass
+    """
+    Distances should be sorted by distance value.
+    """
+
+    graph = create_graph_with_users(1, 2, 3, 4)
+
+    graph.add_friendship(1, 2)
+    graph.add_friendship(1, 3)
+    graph.add_friendship(3, 4)
+
+    service = DistanceService()
+
+    sorted_distances = service.get_sorted_distances_from_user(graph, 1)
+
+    assert sorted_distances == [
+        (1, 0),
+        (2, 1),
+        (3, 1),
+        (4, 2)
+    ]
 
 
 def test_distances_empty_graph():
-    # TODO: test distance service on empty graph
-    pass
+    """
+    Requesting distance from non-existing user
+    should raise validation error.
+    """
+
+    graph = Graph()
+
+    service = DistanceService()
+
+    with pytest.raises(UserNotFoundException):
+        service.get_distances_from_user(graph, 1)
+
+
+def test_invalid_user_distance():
+    """
+    Distance calculation should reject unknown users.
+    """
+
+    graph = create_graph_with_users(1, 2)
+
+    service = DistanceService()
+
+    with pytest.raises(UserNotFoundException):
+        service.get_distances_from_user(graph, 99)
