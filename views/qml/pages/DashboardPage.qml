@@ -30,19 +30,40 @@ Item {
         largestComponentSize: componentsModel.count > 0 ? componentsModel.get(0).size : 0
     })
 
+    // Tracks ids/edge-keys seen on the previous update so we can tell what's
+    // actually *new* the next time the bridge reports users/graph changes,
+    // and surface just that in the Recent Activity feed.
+    property var previousEdgeKeys: ({})
+
     Connections {
         target: root.pyBridge
-        function onUsersChanged(users) { root.liveUsers = users; }
+        function onUsersChanged(users) { root.applyUsersChanged(users); }
         function onGraphChanged(nodes, edges) { root.rebuildTopology(nodes, edges); }
         function onResultReady(title, content) { resultDialog.openWith(title, content, false); }
         function onErrorOccurred(message) { resultDialog.openWith("Error", message, true); }
     }
 
+    function applyUsersChanged(users) {
+        var previousIds = {};
+        for (var i = 0; i < root.liveUsers.length; i++) {
+            previousIds[String(root.liveUsers[i].id)] = true;
+        }
+        for (var j = 0; j < users.length; j++) {
+            var u = users[j];
+            if (!previousIds[String(u.id)]) {
+                root.addActivity("user", "New user added", (u.name || u.id) + " joined the network", "ADDED", true);
+            }
+        }
+        root.liveUsers = users;
+    }
+
     function rebuildTopology(nodes, edges) {
         // The bridge only sends ids/names; lay nodes out on a circle here.
+        var idToName = {};
         var laidOut = [];
         var idToIndex = {};
         for (var i = 0; i < nodes.length; i++) {
+            idToName[String(nodes[i].id)] = nodes[i].name;
             var angle = (2 * Math.PI * i) / Math.max(nodes.length, 1);
             laidOut.push({
                 id: nodes[i].id,
@@ -52,21 +73,84 @@ Item {
             });
             idToIndex[nodes[i].id] = i;
         }
+
         var indexedEdges = [];
+        var newEdgeKeys = {};
         for (var j = 0; j < edges.length; j++) {
-            var a = idToIndex[edges[j].source], b = idToIndex[edges[j].target];
+            var srcId = edges[j].source, dstId = edges[j].target;
+            var a = idToIndex[srcId], b = idToIndex[dstId];
             if (a !== undefined && b !== undefined) indexedEdges.push([a, b]);
+
+            var edgeKey = [String(srcId), String(dstId)].sort().join("::");
+            newEdgeKeys[edgeKey] = true;
+            if (!root.previousEdgeKeys[edgeKey]) {
+                var nameA = idToName[String(srcId)] || srcId;
+                var nameB = idToName[String(dstId)] || dstId;
+                root.addActivity("friendship", "New friendship", nameA + " connected with " + nameB, "VERIFIED", true);
+            }
         }
+        root.previousEdgeKeys = newEdgeKeys;
+
         root.liveNodes = laidOut;
         root.liveEdges = indexedEdges;
         graphCanvas.requestPaint();
     }
+
+    // ---- Recent Activity: real, ticking timestamps -------------------------
+    // Every entry stores an absolute `timestamp` (ms since epoch); the
+    // "Xm ago" label shown in the UI is derived from it on the fly so it
+    // stays accurate as time passes, instead of a fixed string that goes
+    // stale the moment the page is opened.
+    property var nowTick: Date.now()
+
+    Timer {
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: root.nowTick = Date.now()
+    }
+
+    function formatRelativeTime(timestamp) {
+        var diffMs = Math.max(0, root.nowTick - timestamp);
+        var sec = Math.floor(diffMs / 1000);
+        if (sec < 5) return "just now";
+        if (sec < 60) return sec + "s ago";
+        var min = Math.floor(sec / 60);
+        if (min < 60) return min + "m ago";
+        var hr = Math.floor(min / 60);
+        if (hr < 24) return hr + "h ago";
+        var day = Math.floor(hr / 24);
+        return day + "d ago";
+    }
+
+    // Prepends a new activity entry with the current timestamp and caps
+    // the feed so it doesn't grow forever during a long session.
+    function addActivity(kind, title, detail, tagText, tagOk) {
+        activityModel.insert(0, {
+            kind: kind,
+            title: title,
+            detail: detail,
+            timestamp: Date.now(),
+            tagText: tagText,
+            tagOk: tagOk
+        });
+        while (activityModel.count > 30) {
+            activityModel.remove(activityModel.count - 1);
+        }
+    }
+
     ListModel {
         id: activityModel
-        ListElement { kind: "suggestion"; title: "New suggestion"; detail: "Ali and Sara share 4 mutual friends"; time: "2m ago"; tagText: "SCORE 0.82"; tagOk: true }
-        ListElement { kind: "friendship"; title: "New friendship"; detail: "Reza connected with Niloofar"; time: "14m ago"; tagText: "VERIFIED"; tagOk: true }
-        ListElement { kind: "component";  title: "Component merged"; detail: "Two communities became one (12 users)"; time: "28m ago"; tagText: "REVIEW"; tagOk: false }
-        ListElement { kind: "stat";       title: "Stats refreshed"; detail: "Average degree increased to 5.3"; time: "1h ago"; tagText: "OK"; tagOk: true }
+    }
+
+    Component.onCompleted: {
+        // Seed demo data with real, backdated timestamps so the feed reads
+        // exactly like the mock ("2m ago", "14m ago", ...) on first launch,
+        // then keeps counting up accurately from there.
+        activityModel.append({ kind: "suggestion", title: "New suggestion", detail: "Ali and Sara share 4 mutual friends", timestamp: Date.now() - 2 * 60 * 1000, tagText: "SCORE 0.82", tagOk: true });
+        activityModel.append({ kind: "friendship", title: "New friendship", detail: "Reza connected with Niloofar", timestamp: Date.now() - 14 * 60 * 1000, tagText: "VERIFIED", tagOk: true });
+        activityModel.append({ kind: "component", title: "Component merged", detail: "Two communities became one (12 users)", timestamp: Date.now() - 28 * 60 * 1000, tagText: "REVIEW", tagOk: false });
+        activityModel.append({ kind: "stat", title: "Stats refreshed", detail: "Average degree increased to 5.3", timestamp: Date.now() - 60 * 60 * 1000, tagText: "OK", tagOk: true });
     }
     ListModel {
         id: componentsModel
@@ -164,7 +248,7 @@ Item {
                     spacing: DS.Layout.s_sm
 
                     Rectangle {
-                        width: parent.width - 320
+                        width: parent.width - 280
                         height: parent.height
                         radius: DS.Layout.radi_xl
                         color: DS.Colors.surfaceAlt
@@ -185,8 +269,6 @@ Item {
                             }
                         }
                     }
-
-                    IconButton { iconName: "bell"; showBadge: true; anchors.verticalCenter: parent.verticalCenter }
 
                     Btn {
                         text: "Add User"
@@ -223,13 +305,13 @@ Item {
                 Row {
                     width: parent.width
                     spacing: DS.Layout.s_sm
-                    height: 340
+                    height: 460
 
                     Card {
-                        width: parent.width * 0.62
+                        width: parent.width * 0.66
                         height: parent.height
                         title: "Topology Preview"
-                        subtitle: "Largest connected community"
+                        subtitle: "Largest connected community · scroll or pinch to zoom, drag to pan"
 
                         Column {
                             anchors.fill: parent
@@ -244,43 +326,94 @@ Item {
                                 border.color: DS.Colors.border
                                 clip: true
 
-                                Canvas {
-                                    id: graphCanvas
+                                Flickable {
+                                    id: topologyFlick
                                     anchors.fill: parent
                                     anchors.margins: DS.Layout.s_sm
-                                    onPaint: {
-                                        var ctx = getContext("2d");
-                                        ctx.clearRect(0, 0, width, height);
-                                        var nodes = root.liveNodes, edges = root.liveEdges;
+                                    clip: true
+                                    boundsBehavior: Flickable.StopAtBounds
+                                    contentWidth: graphContent.width * graphContent.scale
+                                    contentHeight: graphContent.height * graphContent.scale
 
-                                        ctx.strokeStyle = DS.Colors.edgeColor;
-                                        ctx.lineWidth = 1.4;
-                                        edges.forEach(function(e) {
-                                            var a = nodes[e[0]], b = nodes[e[1]];
-                                            if (!a || !b) return;
-                                            ctx.beginPath();
-                                            ctx.moveTo(a.x * width, a.y * height);
-                                            ctx.lineTo(b.x * width, b.y * height);
-                                            ctx.stroke();
-                                        });
+                                    Item {
+                                        id: graphContent
+                                        width: topologyFlick.width
+                                        height: topologyFlick.height
+                                        scale: 1.0
+                                        transformOrigin: Item.TopLeft
 
-                                        nodes.forEach(function(n) {
-                                            var cx = n.x * width, cy = n.y * height;
+                                        readonly property real minScale: 1.0
+                                        readonly property real maxScale: 4.0
 
-                                            ctx.beginPath();
-                                            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-                                            ctx.fillStyle = DS.Colors.colorForComponent(0);
-                                            ctx.fill();
-                                            ctx.lineWidth = 1;
-                                            ctx.strokeStyle = DS.Colors.background;
-                                            ctx.stroke();
+                                        Canvas {
+                                            id: graphCanvas
+                                            anchors.fill: parent
+                                            onPaint: {
+                                                var ctx = getContext("2d");
+                                                ctx.clearRect(0, 0, width, height);
+                                                var nodes = root.liveNodes, edges = root.liveEdges;
 
-                                            // small id/name label under each node
-                                            ctx.font = "10px " + DS.Typography.fontFamily;
-                                            ctx.textAlign = "center";
-                                            ctx.fillStyle = DS.Colors.textSecondary;
-                                            ctx.fillText(n.name + " (" + n.id + ")", cx, cy + 18);
-                                        });
+                                                ctx.strokeStyle = DS.Colors.edgeColor;
+                                                ctx.lineWidth = 1.4;
+                                                edges.forEach(function(e) {
+                                                    var a = nodes[e[0]], b = nodes[e[1]];
+                                                    if (!a || !b) return;
+                                                    ctx.beginPath();
+                                                    ctx.moveTo(a.x * width, a.y * height);
+                                                    ctx.lineTo(b.x * width, b.y * height);
+                                                    ctx.stroke();
+                                                });
+
+                                                nodes.forEach(function(n) {
+                                                    var cx = n.x * width, cy = n.y * height;
+
+                                                    ctx.beginPath();
+                                                    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+                                                    ctx.fillStyle = DS.Colors.colorForComponent(0);
+                                                    ctx.fill();
+                                                    ctx.lineWidth = 1;
+                                                    ctx.strokeStyle = DS.Colors.background;
+                                                    ctx.stroke();
+
+                                                    // small id/name label under each node
+                                                    ctx.font = "10px " + DS.Typography.fontFamily;
+                                                    ctx.textAlign = "center";
+                                                    ctx.fillStyle = DS.Colors.textSecondary;
+                                                    ctx.fillText(n.name + " (" + n.id + ")", cx, cy + 18);
+                                                });
+                                            }
+                                        }
+                                    }
+
+                                    // Pinch-to-zoom (touch screens / trackpads)
+                                    PinchHandler {
+                                        id: topologyPinch
+                                        target: graphContent
+                                        minimumScale: graphContent.minScale
+                                        maximumScale: graphContent.maxScale
+                                        minimumRotation: 0
+                                        maximumRotation: 0
+                                    }
+
+                                    // Mouse-wheel zoom, keeping the viewport centered
+                                    WheelHandler {
+                                        id: topologyWheel
+                                        target: null
+                                        onWheel: (event) => {
+                                            var oldScale = graphContent.scale;
+                                            var factor = event.angleDelta.y > 0 ? 1.15 : (1 / 1.15);
+                                            var newScale = Math.min(graphContent.maxScale, Math.max(graphContent.minScale, oldScale * factor));
+                                            if (newScale === oldScale) return;
+
+                                            var vw = topologyFlick.width, vh = topologyFlick.height;
+                                            var centerX = topologyFlick.contentX + vw / 2;
+                                            var centerY = topologyFlick.contentY + vh / 2;
+                                            var ratio = newScale / oldScale;
+
+                                            graphContent.scale = newScale;
+                                            topologyFlick.contentX = Math.max(0, Math.min(topologyFlick.contentWidth - vw, centerX * ratio - vw / 2));
+                                            topologyFlick.contentY = Math.max(0, Math.min(topologyFlick.contentHeight - vh, centerY * ratio - vh / 2));
+                                        }
                                     }
                                 }
 
@@ -300,12 +433,35 @@ Item {
                                     StatChip { label: ""; value: root.liveNodes.length + " nodes shown"; accent: DS.Colors.accent }
                                     StatChip { label: ""; value: root.liveEdges.length + " edges"; accent: DS.Colors.success }
                                 }
+
+                                Row {
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    anchors.margins: DS.Layout.s_mm
+                                    spacing: DS.Layout.s_mm
+
+                                    StatChip {
+                                        label: ""
+                                        value: Math.round(graphContent.scale * 100) + "% · reset"
+                                        accent: DS.Colors.textMuted
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                graphContent.scale = 1.0;
+                                                topologyFlick.contentX = 0;
+                                                topologyFlick.contentY = 0;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
 
                     Card {
-                        width: parent.width * 0.38 - DS.Layout.s_sm
+                        width: parent.width * 0.34 - DS.Layout.s_sm
                         height: parent.height
                         title: "Recent Activity"
 
@@ -326,7 +482,8 @@ Item {
                                         anchors.centerIn: parent
                                         size: 15
                                         color: model.tagOk ? DS.Colors.success : DS.Colors.warning
-                                        name: model.kind === "friendship" ? "people"
+                                        name: model.kind === "user" ? "person"
+                                              : model.kind === "friendship" ? "people"
                                               : model.kind === "component" ? "communities"
                                               : model.kind === "stat" ? "dashboard" : "network"
                                     }
@@ -347,7 +504,7 @@ Item {
                                         }
                                         Text {
                                             anchors.right: parent.right
-                                            text: model.time
+                                            text: root.formatRelativeTime(model.timestamp)
                                             font: DS.Typography.caption
                                             color: DS.Colors.textFaint
                                         }
@@ -369,12 +526,12 @@ Item {
                 // ---- Quick actions + communities overview --------------------------
                 Row {
                     width: parent.width
-                    height: 500
+                    height: 400
 
                     Card {
                         
                         width: parent.width     
-                        height: DS.Layout.w_xxl
+                        height: DS.Layout.w_xxl -50
                         title: "Quick Analysis"
 
                         Grid {
