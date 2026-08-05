@@ -32,8 +32,11 @@ class MainController:
             self.handle_error(exc)
 
     def handle_update_user(self, user_id, new_name):
-        # TODO: update user name and refresh UI
-        pass
+        try:
+            self.graph.update_user(user_id, new_name)
+            self.refresh_all_views()
+        except Exception as exc:  # noqa: BLE001
+            self.handle_error(exc)
 
     # -------------------------
     # Friendship actions
@@ -64,6 +67,12 @@ class MainController:
             self.main_window.show_result(
                 "Check Connection", f"{user1_id} and {user2_id} {status}."
             )
+            if connected:
+                result = self.facade.get_shortest_path(user1_id, user2_id)
+                path_ids = [user.get_id() for user in result.get_path()]
+                self.main_window.highlight_path(path_ids)
+            else:
+                self.main_window.highlight_path([])
         except Exception as exc:  # noqa: BLE001
             self.handle_error(exc)
 

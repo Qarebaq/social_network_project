@@ -41,6 +41,22 @@ Item {
         function onGraphChanged(nodes, edges) { root.rebuildTopology(nodes, edges); }
         function onResultReady(title, content) { resultDialog.openWith(title, content, false); }
         function onErrorOccurred(message) { resultDialog.openWith("Error", message, true); }
+        function onPathHighlighted(path) { root.highlightedPath = path; graphCanvas.requestPaint(); }
+    }
+
+    // Ordered list of user ids returned by Check Connection's shortest path
+    // lookup; the topology canvas draws the edges along this path in red.
+    property var highlightedPath: []
+
+    function isHighlightedEdge(idA, idB) {
+        var path = root.highlightedPath;
+        for (var i = 0; i < path.length - 1; i++) {
+            if ((String(path[i]) === String(idA) && String(path[i + 1]) === String(idB)) ||
+                (String(path[i]) === String(idB) && String(path[i + 1]) === String(idA))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function applyUsersChanged(users) {
@@ -353,11 +369,12 @@ Item {
                                                 ctx.clearRect(0, 0, width, height);
                                                 var nodes = root.liveNodes, edges = root.liveEdges;
 
-                                                ctx.strokeStyle = DS.Colors.edgeColor;
-                                                ctx.lineWidth = 1.4;
                                                 edges.forEach(function(e) {
                                                     var a = nodes[e[0]], b = nodes[e[1]];
                                                     if (!a || !b) return;
+                                                    var onPath = root.isHighlightedEdge(a.id, b.id);
+                                                    ctx.strokeStyle = onPath ? DS.Colors.dangerBright : DS.Colors.edgeColor;
+                                                    ctx.lineWidth = onPath ? 3 : 1.4;
                                                     ctx.beginPath();
                                                     ctx.moveTo(a.x * width, a.y * height);
                                                     ctx.lineTo(b.x * width, b.y * height);
@@ -366,10 +383,11 @@ Item {
 
                                                 nodes.forEach(function(n) {
                                                     var cx = n.x * width, cy = n.y * height;
+                                                    var onNode = root.highlightedPath.some(function(id) { return String(id) === String(n.id); });
 
                                                     ctx.beginPath();
                                                     ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-                                                    ctx.fillStyle = DS.Colors.colorForComponent(0);
+                                                    ctx.fillStyle = onNode ? DS.Colors.dangerBright : DS.Colors.colorForComponent(0);
                                                     ctx.fill();
                                                     ctx.lineWidth = 1;
                                                     ctx.strokeStyle = DS.Colors.background;
@@ -531,13 +549,13 @@ Item {
                     Card {
                         
                         width: parent.width     
-                        height: DS.Layout.w_xxl -50
+                        height: DS.Layout.w_xxl +20
                         title: "Quick Analysis"
 
                         Grid {
                             anchors.fill: parent
                             columns: 5
-                            rows: 2
+                            rows: 3
                             columnSpacing: DS.Layout.s_mm
                             rowSpacing: DS.Layout.s_mm
 
@@ -546,11 +564,13 @@ Item {
                                     {icon:"network",title:"Check Connection",subtitle:"Verify whether two users are connected",action:"connection"},
                                     { icon: "people", title: "Suggest Friends", subtitle: "Mutual-friend recommendations", action: "suggestFriends" },
                                     { icon: "communities", title: "Components", subtitle: "Detect connected communities", action: "components" },
+                                    { icon: "communities", title: "Largest Components", subtitle: "Show the largest connected communities", action: "largestComponents" },
                                     { icon: "dashboard", title: "Statistics", subtitle: "Full network statistics report", action: "statistics" },
                                     { icon: "network", title: "Shortest Path", subtitle: "Find shortest route between two users", action: "shortestPath" },
                                     { icon: "people", title: "Distances", subtitle: "Distance from one user to everyone else", action: "distance" },
                                     { icon: "dashboard", title: "Save Graph", subtitle: "Persist the current graph to a JSON file", action: "save" },
                                     { icon: "network", title: "Load Graph", subtitle: "Load a graph from a JSON file", action: "load" },
+                                    { icon: "people", title: "Update User", subtitle: "Rename an existing user", action: "updateUser" },
                                     { icon: "people", title: "Remove User", subtitle: "Delete a user and their friendships", action: "removeUser" },
                                     { icon: "network", title: "Remove Friendship", subtitle: "Delete a friendship between two users", action: "removeFriendship" }
                                 ]
@@ -756,6 +776,14 @@ Item {
 
     case "components":
         root.pyBridge.showComponents()
+        break
+
+    case "largestComponents":
+        root.pyBridge.showLargestComponents()
+        break
+
+    case "updateUser":
+        updateUserDialog.open()
         break
 
     case "statistics":
@@ -1169,6 +1197,49 @@ Item {
         connectionUser1.text = ""
         connectionUser2.text = ""
     }
+    }
+
+    Popup {
+        id: updateUserDialog
+        anchors.centerIn: parent
+        modal: true
+        focus: true
+        width: 360
+        padding: DS.Layout.s_sm + 6
+        background: Rectangle { color: DS.Colors.surface; radius: DS.Layout.radi_l; border.width: 1; border.color: DS.Colors.border }
+
+        Column {
+            width: parent.width
+            spacing: DS.Layout.s_mm
+            Text { text: "Update User"; font: DS.Typography.h2; color: DS.Colors.textPrimary }
+            Text {
+                text: "Rename an existing user."
+                font: DS.Typography.caption
+                color: DS.Colors.textMuted
+                wrapMode: Text.WordWrap
+                width: parent.width
+            }
+            AppTextField { id: updateUserId; label: "User ID"; placeholderText: "e.g. A" }
+            AppTextField { id: updateUserName; label: "New Name"; placeholderText: "e.g. Alice" }
+            Row {
+                width: parent.width
+                spacing: DS.Layout.s_mm
+                Btn { text: "Cancel"; variant: "ghost"; onClicked: updateUserDialog.close() }
+                Btn {
+                    text: "Update"
+                    variant: "primary"
+                    onClicked: {
+                        if (root.hasBridge && updateUserId.text.length > 0 && updateUserName.text.length > 0) {
+                            root.pyBridge.updateUser(updateUserId.text.trim(), updateUserName.text.trim());
+                            updateUserId.text = "";
+                            updateUserName.text = "";
+                            updateUserDialog.close();
+                        }
+                    }
+                }
+            }
+        }
+        onClosed: { updateUserId.text = ""; updateUserName.text = ""; }
     }
 
     Popup {

@@ -12,7 +12,9 @@ from graph.domain.graph import Graph
 from graph.exceptions.graph_exceptions import (
     DuplicateFriendshipException,
     DuplicateUserException,
+    FriendshipNotFoundException,
     SelfFriendshipException,
+    UserNotFoundException,
 )
 
 
@@ -195,3 +197,32 @@ def test_is_empty():
     assert graph.is_empty()
     graph.add_user("A", "Alice")
     assert not graph.is_empty()
+
+def test_remove_non_existing_user():
+    graph = Graph()
+
+    with pytest.raises(UserNotFoundException):
+        graph.remove_user("UNKNOWN")
+
+
+def test_add_friendship_with_missing_user():
+    graph = create_graph_with_users("A")
+
+    with pytest.raises(UserNotFoundException):
+        graph.add_friendship("A", "B")
+
+
+def test_remove_missing_friendship():
+    graph = create_graph_with_users("A", "B")
+
+    with pytest.raises(FriendshipNotFoundException):
+        graph.remove_friendship("A", "B")
+
+
+def test_empty_graph_state():
+    graph = Graph()
+
+    assert graph.get_users() == []
+    assert graph.get_friendships() == []
+    assert graph.get_user_count() == 0
+    assert graph.get_friendship_count() == 0

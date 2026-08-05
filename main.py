@@ -44,6 +44,7 @@ class QmlBridge(QObject):
     graphChanged = Signal(list, list)
     resultReady = Signal(str, str)
     errorOccurred = Signal(str)
+    pathHighlighted = Signal(list)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -93,6 +94,9 @@ class QmlBridge(QObject):
     def show_error(self, message):
         self.errorOccurred.emit(str(message))
 
+    def highlight_path(self, user_ids):
+        self.pathHighlighted.emit([str(uid) for uid in user_ids])
+
     # ---- called by QML -------------------------------------------------
     @Slot(str, str)
     def addUser(self, user_id, name):
@@ -111,6 +115,10 @@ class QmlBridge(QObject):
         self._run(lambda: self._controller.handle_remove_friendship(user1_id, user2_id))
 
     @Slot(str, str)
+    def updateUser(self, user_id, new_name):
+        self._run(lambda: self._controller.handle_update_user(user_id, new_name))
+
+    @Slot(str, str)
     def checkConnection(self, user1_id, user2_id):
         self._run(lambda: self._controller.handle_check_connection(user1_id, user2_id))
 
@@ -121,6 +129,10 @@ class QmlBridge(QObject):
     @Slot()
     def showComponents(self):
         self._run(lambda: self._controller.handle_show_components())
+
+    @Slot()
+    def showLargestComponents(self):
+        self._run(lambda: self._controller.handle_show_largest_components())
 
     @Slot()
     def showStatistics(self):
