@@ -56,6 +56,32 @@ class MainController:
         except Exception as exc:  # noqa: BLE001
             self.handle_error(exc)
 
+    def handle_list_friends(self, user_id):
+        try:
+            friends = self.facade.get_friends(user_id)
+            if not friends:
+                content = f"{user_id} has no friends yet."
+            else:
+                content = "\n".join(
+                    f"{friend.get_id()} - {friend.get_name()}" for friend in friends
+                )
+            self.main_window.show_result("Friends", content)
+        except Exception as exc:  # noqa: BLE001
+            self.handle_error(exc)
+
+    def handle_mutual_friends(self, user1_id, user2_id):
+        try:
+            mutual = self.facade.get_mutual_friends(user1_id, user2_id)
+            if not mutual:
+                content = f"{user1_id} and {user2_id} have no mutual friends."
+            else:
+                content = "\n".join(
+                    f"{friend.get_id()} - {friend.get_name()}" for friend in mutual
+                )
+            self.main_window.show_result("Mutual Friends", content)
+        except Exception as exc:  # noqa: BLE001
+            self.handle_error(exc)
+
     # -------------------------
     # Person B actions
     # -------------------------
@@ -185,8 +211,6 @@ class MainController:
         try:
             path = self._resolve_load_path(file_path)
             loaded_graph = self.repository.load(path)
-            # Mutate the existing graph in place so the same instance
-            # already shared with GraphFacade stays up to date.
             self.graph.clear()
             for user in loaded_graph.get_users():
                 self.graph.add_user(user.get_id(), user.get_name())
@@ -198,7 +222,7 @@ class MainController:
                 )
             self.refresh_all_views()
             self.main_window.show_result("Load Graph", f"Graph loaded from '{path}'.")
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             self.handle_error(exc)
 
     def _resolve_save_path(self, file_name):

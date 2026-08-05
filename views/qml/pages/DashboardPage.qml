@@ -563,6 +563,8 @@ Item {
                                 model: [
                                     {icon:"network",title:"Check Connection",subtitle:"Verify whether two users are connected",action:"connection"},
                                     { icon: "people", title: "Suggest Friends", subtitle: "Mutual-friend recommendations", action: "suggestFriends" },
+                                    { icon: "people", title: "List Friends", subtitle: "Show a user's friend list", action: "listFriends" },
+                                    { icon: "people", title: "Mutual Friends", subtitle: "Friends shared by two users", action: "mutualFriends" },
                                     { icon: "communities", title: "Components", subtitle: "Detect connected communities", action: "components" },
                                     { icon: "communities", title: "Largest Components", subtitle: "Show the largest connected communities", action: "largestComponents" },
                                     { icon: "dashboard", title: "Statistics", subtitle: "Full network statistics report", action: "statistics" },
@@ -764,6 +766,14 @@ Item {
 
     case "suggestFriends":
         suggestFriendsDialog.open()
+        break
+
+    case "listFriends":
+        listFriendsDialog.open()
+        break
+
+    case "mutualFriends":
+        mutualFriendsDialog.open()
         break
 
     case "connection":
@@ -1096,6 +1106,89 @@ Item {
                 }
             }
         }
+    }
+
+    Popup {
+        id: listFriendsDialog
+        anchors.centerIn: parent
+        modal: true
+        focus: true
+        width: 360
+        padding: DS.Layout.s_sm + 6
+        background: Rectangle { color: DS.Colors.surface; radius: DS.Layout.radi_l; border.width: 1; border.color: DS.Colors.border }
+
+        Column {
+            width: parent.width
+            spacing: DS.Layout.s_mm
+            Text { text: "List Friends"; font: DS.Typography.h2; color: DS.Colors.textPrimary }
+            Text {
+                text: "Show every friend of a given user."
+                font: DS.Typography.caption
+                color: DS.Colors.textMuted
+                wrapMode: Text.WordWrap
+                width: parent.width
+            }
+            AppTextField { id: listFriendsUserId; label: "User ID"; placeholderText: "e.g. A" }
+            Row {
+                width: parent.width
+                spacing: DS.Layout.s_mm
+                Btn { text: "Cancel"; variant: "ghost"; onClicked: listFriendsDialog.close() }
+                Btn {
+                    text: "Show"
+                    variant: "primary"
+                    onClicked: {
+                        if (root.hasBridge && listFriendsUserId.text.length > 0) {
+                            root.pyBridge.listFriends(listFriendsUserId.text.trim());
+                            listFriendsDialog.close();
+                        }
+                    }
+                }
+            }
+        }
+        onClosed: listFriendsUserId.text = ""
+    }
+
+    Popup {
+        id: mutualFriendsDialog
+        anchors.centerIn: parent
+        modal: true
+        focus: true
+        width: 360
+        padding: DS.Layout.s_sm + 6
+        background: Rectangle { color: DS.Colors.surface; radius: DS.Layout.radi_l; border.width: 1; border.color: DS.Colors.border }
+
+        Column {
+            width: parent.width
+            spacing: DS.Layout.s_mm
+            Text { text: "Mutual Friends"; font: DS.Typography.h2; color: DS.Colors.textPrimary }
+            Text {
+                text: "Show the friends shared by two users."
+                font: DS.Typography.caption
+                color: DS.Colors.textMuted
+                wrapMode: Text.WordWrap
+                width: parent.width
+            }
+            AppTextField { id: mutualUser1; label: "First User ID"; placeholderText: "e.g. A" }
+            AppTextField { id: mutualUser2; label: "Second User ID"; placeholderText: "e.g. B" }
+            Row {
+                width: parent.width
+                spacing: DS.Layout.s_mm
+                Btn { text: "Cancel"; variant: "ghost"; onClicked: mutualFriendsDialog.close() }
+                Btn {
+                    text: "Show"
+                    variant: "primary"
+                    onClicked: {
+                        if (root.hasBridge && mutualUser1.text.length > 0 && mutualUser2.text.length > 0) {
+                            root.pyBridge.mutualFriends(mutualUser1.text.trim(), mutualUser2.text.trim());
+                            mutualUser1.text = "";
+                            mutualUser2.text = "";
+                            mutualFriendsDialog.close();
+                        }
+                    }
+                }
+            }
+        }
+        onClosed: { mutualUser1.text = ""; mutualUser2.text = ""; }
     }
 
     Popup {

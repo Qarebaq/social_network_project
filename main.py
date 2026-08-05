@@ -163,7 +163,13 @@ class QmlBridge(QObject):
         except Exception as exc:  # noqa: BLE001
             self.show_error(str(exc))
 
+    @Slot(str)
+    def listFriends(self, user_id):
+        self._run(lambda: self._controller.handle_list_friends(user_id))
 
+    @Slot(str, str)
+    def mutualFriends(self, user1_id, user2_id):
+        self._run(lambda: self._controller.handle_mutual_friends(user1_id, user2_id))
 def main():
 
     """ Application entry point for the Social Network Analysis project.

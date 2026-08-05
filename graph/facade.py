@@ -58,6 +58,14 @@ class GraphFacade:
         # call DistanceService.get_distances_from_user
         return self.distance_service.get_distances_from_user(self.graph, source_user_id)
 
+    def get_friends(self, user_id):
+        # call Graph.get_friends
+        return self.graph.get_friends(user_id)
+
+    def get_mutual_friends(self, user1_id, user2_id):
+        # call RecommendationService.get_mutual_friends
+        return self.recommendation_service.get_mutual_friends(self.graph, user1_id, user2_id)
+
     # Optional
 
     def get_key_people(self):
