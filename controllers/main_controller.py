@@ -80,7 +80,7 @@ class MainController:
         try:
             result = self.facade.get_shortest_path(source_user_id, target_user_id)
             if result.path_exists():
-                path_names = " -> ".join(user.get_name() for user in result.get_path())
+                path_names = " -> ".join(user.get_id() for user in result.get_path())
                 content = f"Distance: {result.get_distance()}\nPath: {path_names}"
             else:
                 content = f"No path exists between {source_user_id} and {target_user_id}."
